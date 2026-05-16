@@ -11,7 +11,7 @@ namespace jugyou.batoru.Camera
 
         private float heightOffset = 1.5f;
 
-        private float minPitch = -10;
+        private float minPitch = 10;
 
         private float maxPitch = 60;
 
@@ -53,10 +53,10 @@ namespace jugyou.batoru.Camera
         {
             if (target == null) return;
             Vector3 targetPosi = target.position + Vector3.up * heightOffset;
-            Quaternion rotate = Quaternion.Euler(currentPitch, currentYaw, 0);
+            Quaternion rotate = Quaternion.Euler(currentPitch, currentYaw, 0f);
 
             //注意点から、計算した角度から後ろ方向へ距離分だけ離した位置を計算
-            Vector3 cameraPosi = target.position - (rotate * Vector3.forward * distance);
+            Vector3 cameraPosi = targetPosi - (rotate * Vector3.forward * distance);
 
             transform.position = cameraPosi;
             transform.rotation = rotate;
