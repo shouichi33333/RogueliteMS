@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 775307258}
   - component: {fileID: 775307257}
   - component: {fileID: 775307260}
+  - component: {fileID: 775307261}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -496,6 +497,24 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &775307261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775307256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86908b92d8baf1d4e9896bd9732a14bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::jugyou.batoru.Camera.cameraController
+  target: {fileID: 1956590360}
+--- !u!4 &1956590360 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3409582543254896077, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
+  m_PrefabInstance: {fileID: 4804147172837637329}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4804147172837637329
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -547,6 +566,10 @@ PrefabInstance:
     - target: {fileID: 3992061322412231080, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
       propertyPath: m_Name
       value: player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5291177293693067461, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
+      propertyPath: m_Constraints
+      value: 80
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
