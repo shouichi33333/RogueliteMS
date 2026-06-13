@@ -14,7 +14,7 @@ namespace jugyou.batoru.Player
 
         private const float laserMaxDistance = 50f;
 
-        private const int ATTACK_DAMAGE = 20;
+        private const int ATTACK_DAMAGE = 1;
 
         private const float ATTACK_RANGE = 50f;
 

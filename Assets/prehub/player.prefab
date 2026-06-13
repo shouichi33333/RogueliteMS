@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2138906910194955626}
   - component: {fileID: 5291177293693067461}
   - component: {fileID: 1982481037059265653}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6682009906790127409}
   - component: {fileID: 5295666009954979006}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: weponOrigin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
