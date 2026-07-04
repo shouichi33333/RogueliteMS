@@ -84,7 +84,7 @@ namespace jugyou.batoru.spawner
             }
             else
             {
-                Debug.Log("敵がキューにいない");
+                //Debug.Log("敵がキューにいない");
                 return;
             }
 
@@ -95,7 +95,7 @@ namespace jugyou.batoru.spawner
             Estate.gameObject.transform.rotation = Quaternion.identity;
             Estate.gameObject.SetActive(true);
 
-            Debug.Log("敵出現！");
+            //Debug.Log("敵出現！");
         }
 
         private void ReturnToPool(EnemyState enemy)
