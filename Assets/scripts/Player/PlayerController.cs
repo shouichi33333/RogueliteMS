@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using MasterData;
 using jugyou.batoru.Enum;
 namespace jugyou.batoru.Player
 {
@@ -23,7 +24,9 @@ namespace jugyou.batoru.Player
 
         [SerializeField] private LineRenderer laserLineRenderer;
 
-        [SerializeField] private WeaponDataSO WeaponData;
+        [SerializeField] private ulong weaponId = 1;
+
+        private WeaponDataRecord WeaponData;
 
         private PlayerInptActions inputActions;
 
@@ -44,6 +47,11 @@ namespace jugyou.batoru.Player
 
         private void Awake()
         {
+            gameObject.SetActive(false);
+        }
+        public void Setup()
+        {
+            WeaponData = MasterDataAccessor.Instance.GetById<WeaponDataRecord>(weaponId);
             if (WeaponData == null)
             {
                 Debug.LogError("SOついてない");
@@ -63,15 +71,15 @@ namespace jugyou.batoru.Player
             {
                 Debug.LogError("カメラがないよ");
             }
+            gameObject.SetActive(true);
         }
-
         private void OnEnable()
         {
-            inputActions.Enable();
+            inputActions?.Enable();
         }
         private void OnDisable()
         {
-            inputActions.Disable();
+            inputActions?.Disable();
         }
         private void Update()
         {
@@ -86,11 +94,22 @@ namespace jugyou.batoru.Player
 
         private void Move()
         {
-            if (RB == null)
+            if (RB == null || mainCameraTra == null)
             {
                 Debug.LogError("リジットボディがついていないよ");
                 return;
             }
+
+            Vector3 cameraForward = mainCameraTra.forward;
+            cameraForward.y = 0;
+            cameraForward.Normalize();
+
+            if (cameraForward != Vector3.zero)
+            {
+                Quaternion targetrotation = Quaternion.LookRotation(cameraForward);
+                RB.rotation = Quaternion.Slerp(RB.rotation, targetrotation, rotateSpeed * Time.deltaTime);
+            }
+
             if (moveInput == Vector2.zero)
             {
                 RB.linearVelocity = new Vector3(0f, RB.linearVelocity.y, 0f);
@@ -98,18 +117,12 @@ namespace jugyou.batoru.Player
                 return;
             }
 
-            Vector3 cameraForward = mainCameraTra.forward;
             Vector3 cameraRight = mainCameraTra.right;
 
-            cameraForward.y = 0f;
             cameraRight.y = 0f;
-            cameraForward.Normalize();
             cameraRight.Normalize();
 
             Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
-
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            RB.rotation = Quaternion.Slerp(RB.rotation, targetRotation, rotateSpeed * Time.deltaTime);
 
             Vector3 targetVelocity = moveDirection * moveSpeed;
             RB.linearVelocity = new Vector3(targetVelocity.x, RB.linearVelocity.y, targetVelocity.z);
@@ -127,7 +140,7 @@ namespace jugyou.batoru.Player
                 }
                 fireCT = new CancellationTokenSource();
                 var linkedCT = CancellationTokenSource.CreateLinkedTokenSource(fireCT.Token, this.GetCancellationTokenOnDestroy());
-                switch (WeaponData.WeponType)
+                switch ((FireType)WeaponData.WeponType)
                 {
                     case FireType.SemiAuto:
                         ShotSemiAutoAsync(this.GetCancellationTokenOnDestroy()).Forget();
@@ -197,11 +210,15 @@ namespace jugyou.batoru.Player
             canShot = false;
             while (!token.IsCancellationRequested)
             {
-                if (CurrntAmmo <= 0) break;
+                if (CurrntAmmo <= 0)
+                {
+                    reload().Forget();
+                    break;
+                }
                 CurrntAmmo -= 1;
                 Shoot();
                 bool isCanceled = await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireInterval), cancellationToken: token).SuppressCancellationThrow();
-                if(isCanceled == true)
+                if (isCanceled == true)
                 {
                     break;
                 }

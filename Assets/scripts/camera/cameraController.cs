@@ -5,17 +5,23 @@ namespace jugyou.batoru.Camera
 
     public class cameraController : MonoBehaviour
     {
-        private float lookSensitivity = 0.2f;
-
-        private float distance = 5;
-
-        private float heightOffset = 1.5f;
-
-        private float minPitch = 10;
-
-        private float maxPitch = 60;
-
         [SerializeField] private Transform target;
+
+        [Header("カメラの基本設定")]
+        [SerializeField] float lookSensitivity = 0.2f;
+
+        [SerializeField] float minPitch = -10;
+
+        [SerializeField] float maxPitch = 60;
+
+        [SerializeField] float zoomSpeed = 5;
+
+        [Header("カメラの視点")]
+        [SerializeField] float targetDistance = 2;
+
+        [SerializeField] float targetHeightOffset = 1;
+
+        [SerializeField] float targetShoulderOffset = 0.5f;
 
         private PlayerInptActions inputActions;
 
@@ -24,6 +30,12 @@ namespace jugyou.batoru.Camera
         private float currentYaw = 0;
 
         private float currentPitch = 20;
+
+        private float currentDistance = 0;
+
+        private float currentHeightOffset = 0;
+
+        private float currentShouldereOffset = 0;
 
         private void Awake()
         {
@@ -52,13 +64,21 @@ namespace jugyou.batoru.Camera
         private void LateUpdate()
         {
             if (target == null) return;
-            Vector3 targetPosi = target.position + Vector3.up * heightOffset;
+
+            currentDistance = Mathf.Lerp(currentDistance, targetDistance, zoomSpeed * Time.deltaTime);
+            currentHeightOffset = Mathf.Lerp(currentHeightOffset,targetHeightOffset, zoomSpeed * Time.deltaTime);
+            currentShouldereOffset = Mathf.Lerp(currentShouldereOffset,targetShoulderOffset,zoomSpeed * Time.deltaTime);
+
             Quaternion rotate = Quaternion.Euler(currentPitch, currentYaw, 0f);
 
-            //注意点から、計算した角度から後ろ方向へ距離分だけ離した位置を計算
-            Vector3 cameraPosi = targetPosi - (rotate * Vector3.forward * distance);
+            Vector3 basePosition = target.position + Vector3.up * currentHeightOffset;
 
-            transform.position = cameraPosi;
+            Vector3 shoulderPosition = basePosition + (rotate * Vector3.right * currentShouldereOffset);
+
+            //注意点から、計算した角度から後ろ方向へ距離分だけ離した位置を計算
+            Vector3 cameraPosition = shoulderPosition + (rotate * Vector3.forward * currentDistance);
+
+            transform.position = cameraPosition;
             transform.rotation = rotate;
         }
     }

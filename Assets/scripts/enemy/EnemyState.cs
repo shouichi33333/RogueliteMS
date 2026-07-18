@@ -1,4 +1,5 @@
 using Core.Interface;
+using MasterData;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,14 +7,20 @@ namespace jugyou.batoru.enemy
 {
     public class EnemyState : MonoBehaviour,IDamageable
     {
-        [field:SerializeField] public EnemyDataSO EnemyData {  get; private set; }
+        public EnemyDataRecord EnemyData {  get; private set; }
         public int CurrentHP {  get; private set; }
 
         public event UnityAction<EnemyState> OnReturnToPoolAction;
-        private void OnEnable()
+
+        public void initialize(ulong id)
         {
-            if (EnemyData == null) return; 
+            EnemyData = MasterDataAccessor.Instance.GetById<EnemyDataRecord>(id);
+        }
+        public void Setup()
+        {
+            if (EnemyData == null) return;
             CurrentHP = EnemyData.MaxHp;
+            gameObject.SetActive(true);
         }
         public void TekeDamage(int damage)
         {

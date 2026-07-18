@@ -934,6 +934,65 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3409582543254896077, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
   m_PrefabInstance: {fileID: 963218900}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &710324887
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 710324890}
+  - component: {fileID: 710324889}
+  - component: {fileID: 710324888}
+  m_Layer: 0
+  m_Name: Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &710324888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710324887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53584a14cfb358f4ebb2cf33ebd85d27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MasterData.MasterDataAccessor
+--- !u!114 &710324889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710324887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82fe8db685e112e4fa946266e8330d33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::jugyou.batoru.Manager.GameManager
+  player: {fileID: 963218901}
+  enemySpawner: {fileID: 1418187224}
+--- !u!4 &710324890
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710324887}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &734689832
 GameObject:
   m_ObjectHideFlags: 0
@@ -1355,6 +1414,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::jugyou.batoru.Camera.cameraController
   target: {fileID: 654462871}
+  lookSensitivity: 0.2
+  minPitch: 10
+  maxPitch: 60
+  zoomSpeed: 5
+  targetDistance: -6
+  targetHeightOffset: 1
+  targetShoulderOffset: 0.5
 --- !u!1 &887768825
 GameObject:
   m_ObjectHideFlags: 0
@@ -1524,6 +1590,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
+--- !u!114 &963218901 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1982481037059265653, guid: aeb46558decd7d64cb668c0f0ae42ff5, type: 3}
+  m_PrefabInstance: {fileID: 963218900}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 481fd6adc8783b44c8df5658ea88d55b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
 --- !u!1 &1090465078
 GameObject:
   m_ObjectHideFlags: 0
@@ -2100,3 +2177,4 @@ SceneRoots:
   - {fileID: 963218900}
   - {fileID: 584190652}
   - {fileID: 1418187225}
+  - {fileID: 710324890}

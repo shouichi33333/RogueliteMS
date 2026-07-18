@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using jugyou.batoru.enemy;
+using MasterData;
 
 namespace jugyou.batoru.spawner
 {
@@ -17,21 +18,25 @@ namespace jugyou.batoru.spawner
         [SerializeField] private Transform[] spawnPoint;
 
         private Queue<EnemyState> enemys = new Queue<EnemyState>();
-        private void Start()
+
+        public void Setup()
         {
+            if (enemyPrefab == null) return;
+
+            for (int i = 0; i < maxEnemy; i++)
+            {
+                GameObject enemy = Instantiate(enemyPrefab, this.transform);
+                EnemyState enemyState = enemy.GetComponent<EnemyState>();
+                ulong randomId = (ulong)UnityEngine.Random.Range(1, MasterDataAccessor.Instance.Count<EnemyDataRecord>());
+                enemyState.initialize(randomId);
+                enemyState.gameObject.SetActive(false);
+                enemys.Enqueue(enemyState);
+            }
             spawnLoopAsync().Forget();
         }
         async UniTaskVoid spawnLoopAsync()
         {
             var token = this.GetCancellationTokenOnDestroy();
-            for(int i = 0;i < maxEnemy; i++)
-            {
-                GameObject enemy = Instantiate(enemyPrefab,this.transform);
-                EnemyState enemyState = enemy.GetComponent<EnemyState>();
-                enemyState.gameObject.SetActive(false);
-                enemys.Enqueue(enemyState);
-            }
-
             while (true)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(spawnInterval), cancellationToken: token);
@@ -78,7 +83,7 @@ namespace jugyou.batoru.spawner
                 //    }
                 //}
             }
-            if(enemys.Count > 0)
+            if (enemys.Count > 0)
             {
                 Estate = enemys.Dequeue();
             }
@@ -93,8 +98,8 @@ namespace jugyou.batoru.spawner
 
             Estate.gameObject.transform.position = spawn.position;
             Estate.gameObject.transform.rotation = Quaternion.identity;
-            Estate.gameObject.SetActive(true);
 
+            Estate.Setup();
             //Debug.Log("ìGèoåªÅI");
         }
 

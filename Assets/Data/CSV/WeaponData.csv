@@ -1,0 +1,4 @@
+Id,WeaponName,WeponType,AttackPower,FireInterval,FireRate,MaxAmmo,ReloadTime
+1,ショットガン,0,50,1.2,1.2,8,2
+2,バースト,1,8,0.1,0.3,45,2
+3,ミニガン,2,2,0.02,0.5,300,3

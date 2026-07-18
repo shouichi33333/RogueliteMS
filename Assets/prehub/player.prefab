@@ -159,7 +159,7 @@ MonoBehaviour:
   RB: {fileID: 5291177293693067461}
   weponOrigin: {fileID: 6682009906790127409}
   laserLineRenderer: {fileID: 5295666009954979006}
-  WeaponData: {fileID: 11400000, guid: 9157753779052c04cade1c7d77a13237, type: 2}
+  weaponId: 3
 --- !u!1 &7070734451058665481
 GameObject:
   m_ObjectHideFlags: 0
