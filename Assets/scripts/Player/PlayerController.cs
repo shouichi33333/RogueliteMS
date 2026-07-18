@@ -26,6 +26,8 @@ namespace jugyou.batoru.Player
 
         [SerializeField] private ulong weaponId = 1;
 
+        [SerializeField] ParticleSystem muzzleFlash;
+
         private WeaponDataRecord WeaponData;
 
         private PlayerInptActions inputActions;
@@ -230,6 +232,10 @@ namespace jugyou.batoru.Player
 
         private void Shoot()
         {
+            if(muzzleFlash != null)
+            {
+                muzzleFlash.Play();
+            }
             Ray ray = new Ray(mainCameraTra.position, mainCameraTra.forward);
             if (Physics.Raycast(ray, out RaycastHit hitInfo, ATTACK_RANGE))
             {
