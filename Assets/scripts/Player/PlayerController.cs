@@ -6,6 +6,10 @@ using System;
 using System.Threading;
 using MasterData;
 using jugyou.batoru.Enum;
+using TMPro;
+using UnityEngine.UI;
+using DG.Tweening;
+
 namespace jugyou.batoru.Player
 {
     public class PlayerController : MonoBehaviour
@@ -28,6 +32,20 @@ namespace jugyou.batoru.Player
 
         [SerializeField] ParticleSystem muzzleFlash;
 
+        [SerializeField] TextMeshProUGUI weaponName;
+
+        [SerializeField] TextMeshProUGUI ammoText;
+
+        [SerializeField] GameObject reloadUI;
+
+        [SerializeField] Image reloadCircleImage;
+
+        [SerializeField] Slider expBar;
+
+        [SerializeField] TextMeshProUGUI levelUpText;
+
+        [SerializeField] ParticleSystem levelUpEffect;
+
         private WeaponDataRecord WeaponData;
 
         private PlayerInptActions inputActions;
@@ -47,6 +65,12 @@ namespace jugyou.batoru.Player
 
         public int CurrntAmmo { get; private set; }
 
+        public int CurrntExp { get; private set; }
+
+        public int CurrntLevel { get; private set; }
+
+        private int RepuiredExp => CurrntLevel * 5;
+
         private void Awake()
         {
             gameObject.SetActive(false);
@@ -60,6 +84,7 @@ namespace jugyou.batoru.Player
                 return;
             }
             CurrntAmmo = WeaponData.MaxAmmo;
+            UpdateWeaponUI();
             inputActions = new PlayerInptActions();
             inputActions.Player.Fire.performed += Fire;
             inputActions.Player.Fire.canceled += Fire;
@@ -73,8 +98,22 @@ namespace jugyou.batoru.Player
             {
                 Debug.LogError("ÉJÉÅÉâÇ™Ç»Ç¢ÇÊ");
             }
+            if (reloadUI != null)
+            {
+                reloadUI.SetActive(false);
+            }
+
+            CurrntExp = 0;
+            CurrntLevel = 1;
+
+            if (levelUpText != null)
+            {
+                levelUpText.enabled = false;
+            }
+
             gameObject.SetActive(true);
         }
+
         private void OnEnable()
         {
             inputActions?.Enable();
@@ -169,12 +208,13 @@ namespace jugyou.batoru.Player
         {
             if (CurrntAmmo == 0)
             {
-                reload().Forget();
+                reload();
                 return;
             }
             canShot = false;
 
             CurrntAmmo -= 1;
+            UpdateCurrentAmooUI();
             Debug.Log(CurrntAmmo);
             Shoot();
             await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireRate), cancellationToken: token);
@@ -184,7 +224,7 @@ namespace jugyou.batoru.Player
         {
             if (CurrntAmmo == 0)
             {
-                reload().Forget();
+                reload();
                 return;
             }
             canShot = false;
@@ -196,6 +236,7 @@ namespace jugyou.batoru.Player
                     return;
                 }
                 CurrntAmmo -= 1;
+                UpdateCurrentAmooUI();
                 Shoot();
                 await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireInterval), cancellationToken: token);
             }
@@ -206,7 +247,7 @@ namespace jugyou.batoru.Player
         {
             if (CurrntAmmo == 0)
             {
-                reload().Forget();
+                reload();
                 return;
             }
             canShot = false;
@@ -214,10 +255,11 @@ namespace jugyou.batoru.Player
             {
                 if (CurrntAmmo <= 0)
                 {
-                    reload().Forget();
+                    reload();
                     break;
                 }
                 CurrntAmmo -= 1;
+                UpdateCurrentAmooUI();
                 Shoot();
                 bool isCanceled = await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireInterval), cancellationToken: token).SuppressCancellationThrow();
                 if (isCanceled == true)
@@ -232,7 +274,7 @@ namespace jugyou.batoru.Player
 
         private void Shoot()
         {
-            if(muzzleFlash != null)
+            if (muzzleFlash != null)
             {
                 muzzleFlash.Play();
             }
@@ -250,15 +292,26 @@ namespace jugyou.batoru.Player
         }
         private void Reload(InputAction.CallbackContext context)
         {
-            if (isReloding == false || CurrntAmmo != WeaponData.MaxAmmo) reload().Forget();
+            if (isReloding == false || CurrntAmmo != WeaponData.MaxAmmo) reload();
         }
-        private async UniTask reload()
+        private void reload()
         {
             isReloding = true;
-            Debug.Log("rode");
-            await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.ReloadTime), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+            if (reloadUI != null)
+            {
+                reloadUI.SetActive(true);
+            }
+
+            if (reloadCircleImage != null)
+            {
+                reloadCircleImage.fillAmount = 0;
+            }
+
+            DOVirtual.Float(0, 1, WeaponData.ReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
 
             CurrntAmmo = WeaponData.MaxAmmo;
+            UpdateCurrentAmooUI();
             isReloding = false;
             Debug.Log("crea");
         }
@@ -285,6 +338,61 @@ namespace jugyou.batoru.Player
             else
             {
                 laserLineRenderer.SetPosition(1, ray.GetPoint(laserMaxDistance));
+            }
+        }
+
+        private void UpdateWeaponUI()
+        {
+            if (weaponName != null)
+            {
+                weaponName.SetText(WeaponData.WeaponName);
+                switch ((FireType)WeaponData.WeponType)
+                {
+                    case FireType.SemiAuto:
+                        weaponName.color = Color.black;
+                        break;
+                    case FireType.Burst:
+                        weaponName.color = Color.white;
+                        break;
+                    case FireType.FullAuto:
+                        weaponName.color = Color.green;
+                        break;
+                }
+            }
+            UpdateCurrentAmooUI();
+        }
+        private void UpdateCurrentAmooUI()
+        {
+            if (ammoText != null)
+            {
+                ammoText.SetText($"{CurrntAmmo}/{WeaponData.MaxAmmo}");
+            }
+        }
+        private void UpdateReloadUI(float value)
+        {
+            if (reloadCircleImage != null)
+            {
+                reloadCircleImage.fillAmount = value;
+            }
+        }
+        private void FinishReload()
+        {
+            if (reloadUI != null)
+            {
+                reloadUI.SetActive(false);
+            }
+        }
+
+        public void addExp(int exp)
+        {
+            CurrntExp += exp;
+            UpdateExpUI();
+        }
+        private void UpdateExpUI()
+        {
+            if (expBar != null)
+            {
+                expBar.value = (float)CurrntExp / RepuiredExp;
             }
         }
     }

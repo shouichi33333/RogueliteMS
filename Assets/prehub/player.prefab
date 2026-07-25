@@ -160,8 +160,10 @@ MonoBehaviour:
   RB: {fileID: 5291177293693067461}
   weponOrigin: {fileID: 6682009906790127409}
   laserLineRenderer: {fileID: 5295666009954979006}
-  weaponId: 3
+  weaponId: 1
   muzzleFlash: {fileID: 5666981590918114910}
+  weaponName: {fileID: 0}
+  ammoText: {fileID: 0}
 --- !u!1 &7070734451058665481
 GameObject:
   m_ObjectHideFlags: 0

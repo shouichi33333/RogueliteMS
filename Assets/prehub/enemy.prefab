@@ -129,7 +129,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4fdc591f2d1b1542831b4fd2f843d78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::jugyou.batoru.enemy.EnemyState
-  <EnemyData>k__BackingField: {fileID: 11400000, guid: 7ca97ed6baea52942acd27ee34338de4, type: 2}
+  modelRenderers:
+  - {fileID: 2340545438400250369}
+  experienceOrbPrefab: {fileID: 2414094373527285237, guid: 1cc60c0261bc50b4dab99db530bac0a0, type: 3}
 --- !u!195 &6987281233689060390
 NavMeshAgent:
   m_ObjectHideFlags: 0
