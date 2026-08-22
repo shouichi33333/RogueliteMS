@@ -160,10 +160,15 @@ MonoBehaviour:
   RB: {fileID: 5291177293693067461}
   weponOrigin: {fileID: 6682009906790127409}
   laserLineRenderer: {fileID: 5295666009954979006}
-  weaponId: 1
+  weaponId: 2
   muzzleFlash: {fileID: 5666981590918114910}
   weaponName: {fileID: 0}
   ammoText: {fileID: 0}
+  reloadUI: {fileID: 0}
+  reloadCircleImage: {fileID: 0}
+  expBar: {fileID: 0}
+  levelUpText: {fileID: 0}
+  levelUpEffect: {fileID: 6419593506106526418, guid: 942cdb3726ff63741a974c1107b742a9, type: 3}
 --- !u!1 &7070734451058665481
 GameObject:
   m_ObjectHideFlags: 0

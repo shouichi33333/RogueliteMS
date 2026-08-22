@@ -22,6 +22,8 @@ namespace jugyou.batoru.Player
 
         private const float ATTACK_RANGE = 50f;
 
+        private const float LevelUpEffectDuration = 2;
+
         [SerializeField] private Rigidbody RB;  //リジットボディ
 
         [SerializeField] private Transform weponOrigin;
@@ -69,7 +71,7 @@ namespace jugyou.batoru.Player
 
         public int CurrntLevel { get; private set; }
 
-        private int RepuiredExp => CurrntLevel * 5;
+        private int RequiredExp => CurrntLevel * 5;
 
         private void Awake()
         {
@@ -175,7 +177,7 @@ namespace jugyou.batoru.Player
         {
             if (context.performed)
             {
-                if (!canShot || isReloding || WeaponData == null)
+                if (!canShot || isReloding == true || WeaponData == null)
                 {
                     return;
                 }
@@ -307,13 +309,7 @@ namespace jugyou.batoru.Player
             {
                 reloadCircleImage.fillAmount = 0;
             }
-
-            DOVirtual.Float(0, 1, WeaponData.ReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
-
-            CurrntAmmo = WeaponData.MaxAmmo;
-            UpdateCurrentAmooUI();
-            isReloding = false;
-            Debug.Log("crea");
+            DOVirtual.Float(0f, 1f, WeaponData.ReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
         }
         private void DrawLaserPointer()
         {
@@ -380,20 +376,60 @@ namespace jugyou.batoru.Player
             if (reloadUI != null)
             {
                 reloadUI.SetActive(false);
+
+                CurrntAmmo = WeaponData.MaxAmmo;
+                UpdateCurrentAmooUI();
+                isReloding = false;
+                Debug.Log("crea");
+
             }
         }
 
         public void addExp(int exp)
         {
             CurrntExp += exp;
+
+            if(CurrntExp >= RequiredExp)
+            {
+                LevelUp();
+            }
+
             UpdateExpUI();
         }
         private void UpdateExpUI()
         {
             if (expBar != null)
             {
-                expBar.value = (float)CurrntExp / RepuiredExp;
+                expBar.value = (float)CurrntExp / RequiredExp;
             }
         }
+
+        private void LevelUp()
+        {
+            CurrntLevel++;
+
+            CurrntExp -= RequiredExp;
+
+            if (levelUpEffect != null)
+            {
+                levelUpEffect.Play();
+            }
+            ShowLevelUpText().Forget();
+        }
+
+        private async UniTaskVoid ShowLevelUpText()
+        {
+            if (levelUpText == null)
+            {
+                return;
+            }
+            levelUpText.enabled = true;
+            levelUpText.SetText($"Level UP!\n<size=50%>Lv.{CurrntLevel}</size>");
+
+            await UniTask.Delay(TimeSpan.FromSeconds(LevelUpEffectDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+            levelUpText.enabled = false;
+        }
+
     }
 }
