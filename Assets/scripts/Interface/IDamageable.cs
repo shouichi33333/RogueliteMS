@@ -6,6 +6,6 @@ namespace Core.Interface
         /// 
         /// </summary>
         /// <param name="damage"></param>
-        public void TekeDamage(int damage);
+        public void TakeDamage(int damage);
     }
 }

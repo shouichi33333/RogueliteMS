@@ -13,7 +13,7 @@ using jugyou.batoru.Manager;
 
 namespace jugyou.batoru.Player
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour , IDamageable
     {
         private const float moveSpeed = 5f; //変更不可のスピード
 
@@ -49,6 +49,8 @@ namespace jugyou.batoru.Player
 
         [SerializeField] ParticleSystem levelUpEffect;
 
+        [SerializeField] Slider hpBar;
+
         private WeaponDataRecord WeaponData;
 
         private PlayerInptActions inputActions;
@@ -78,6 +80,10 @@ namespace jugyou.batoru.Player
         public int CurrntExp { get; private set; }
 
         public int CurrntLevel { get; private set; }
+
+        public int MaxHP { get; private set; } = 100;
+
+        public int CurrntHP { get; private set; }
 
         private int RequiredExp => CurrntLevel * 5;
 
@@ -135,6 +141,10 @@ namespace jugyou.batoru.Player
             {
                 levelUpText.enabled = false;
             }
+
+            CurrntHP = MaxHP;
+            UpdateHpBar();
+            UpdateExpUI();
 
             gameObject.SetActive(true);
         }
@@ -312,7 +322,7 @@ namespace jugyou.batoru.Player
                 if (target != null)
                 {
                     Debug.Log("teki");
-                    target.TekeDamage(FinalAttackPower);
+                    target.TakeDamage(FinalAttackPower);
                 }
             }
         }
@@ -478,6 +488,39 @@ namespace jugyou.batoru.Player
                     UpdateCurrentAmooUI();
                     maxAmmoBuf += (int)skill.Value;
                     break;
+            }
+        }
+
+        private void UpdateHpBar()
+        {
+            if(hpBar != null)
+            {
+                hpBar.value = (float)CurrntHP / MaxHP;
+            }
+        }
+
+        private void Die()
+        {
+            gameObject.SetActive(false);
+
+            if(GameManager.Instance != null)
+            {
+                GameManager.Instance.GameOver();
+            }
+        }
+
+        public void TakeDamage(int damage)
+        {
+            if(damage <= 0 || CurrntHP <= 0)
+            {
+                return;
+            }
+            CurrntHP -= damage;
+            UpdateHpBar();
+
+            if(CurrntHP <= 0)
+            {
+                Die();
             }
         }
 

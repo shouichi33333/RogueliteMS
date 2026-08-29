@@ -51,7 +51,7 @@ namespace jugyou.batoru.enemy
             gameObject.SetActive(true);
             ResetColor();
         }
-        public void TekeDamage(int damage)
+        public void TakeDamage(int damage)
         {
             if (damage <= 0)
             {
@@ -115,6 +115,15 @@ namespace jugyou.batoru.enemy
             if (!isCanceled)
             {
                 ResetColor();
+            }
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            var player = collision.gameObject.GetComponent<IDamageable>();
+            if(player != null && collision.gameObject.CompareTag("Player"))
+            {
+                player.TakeDamage(10);
             }
         }
 
