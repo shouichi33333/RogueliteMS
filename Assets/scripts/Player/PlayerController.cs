@@ -9,6 +9,7 @@ using jugyou.batoru.Enum;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using jugyou.batoru.Manager;
 
 namespace jugyou.batoru.Player
 {
@@ -63,6 +64,13 @@ namespace jugyou.batoru.Player
         private bool canShot = true;
 
         private CancellationTokenSource fireCT;
+
+        private float moveSpeedBuf = 0;
+        private float attackPowerBuf = 0;
+        private float fireRateBuf = 0;
+        private float reloadSpeedBuf = 0;
+        private int maxAmmoBuf = 0;
+
         public Vector3 CurrentVelocity { get; private set; }   //現在のベロシティを引き取れる
 
         public int CurrntAmmo { get; private set; }
@@ -72,6 +80,14 @@ namespace jugyou.batoru.Player
         public int CurrntLevel { get; private set; }
 
         private int RequiredExp => CurrntLevel * 5;
+
+        private int FinalAttackPower => WeaponData != null ? Mathf.RoundToInt(WeaponData.AttackPower * (1f + attackPowerBuf)) : 0;
+
+        private int FInalMaxAmmo => WeaponData != null ? WeaponData.MaxAmmo + maxAmmoBuf : 0;
+
+        private float FinalReloadTime => WeaponData != null ? WeaponData.ReloadTime * Mathf.Max(0.1f, 1f - reloadSpeedBuf) : 0;
+
+        private float FinalFireRate => WeaponData != null ? WeaponData.FireRate * Mathf.Max(0.1f, 1f - fireRateBuf) : 0;
 
         private void Awake()
         {
@@ -100,6 +116,13 @@ namespace jugyou.batoru.Player
             {
                 Debug.LogError("カメラがないよ");
             }
+
+            moveSpeedBuf = 0;
+            attackPowerBuf = 0;
+            fireRateBuf = 0;
+            reloadSpeedBuf = 0;
+            maxAmmoBuf = 0;
+
             if (reloadUI != null)
             {
                 reloadUI.SetActive(false);
@@ -167,7 +190,8 @@ namespace jugyou.batoru.Player
 
             Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
 
-            Vector3 targetVelocity = moveDirection * moveSpeed;
+            float finalMoveSpeed = moveSpeed * (1f + moveSpeedBuf);
+            Vector3 targetVelocity = moveDirection * finalMoveSpeed;
             RB.linearVelocity = new Vector3(targetVelocity.x, RB.linearVelocity.y, targetVelocity.z);
 
             CurrentVelocity = RB.linearVelocity;
@@ -219,7 +243,7 @@ namespace jugyou.batoru.Player
             UpdateCurrentAmooUI();
             Debug.Log(CurrntAmmo);
             Shoot();
-            await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireRate), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(FinalFireRate), cancellationToken: token);
             canShot = true;
         }
         private async UniTaskVoid ShotBurstAsync(CancellationToken token)
@@ -242,7 +266,7 @@ namespace jugyou.batoru.Player
                 Shoot();
                 await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireInterval), cancellationToken: token);
             }
-            await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireRate), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(FinalFireRate), cancellationToken: token);
             canShot = true;
         }
         private async UniTaskVoid ShotFullAutoAsync(CancellationToken token)
@@ -270,7 +294,7 @@ namespace jugyou.batoru.Player
                 }
             }
             Debug.Log(token == null);
-            await UniTask.Delay(TimeSpan.FromSeconds(WeaponData.FireRate), cancellationToken: this.GetCancellationTokenOnDestroy());
+            await UniTask.Delay(TimeSpan.FromSeconds(FinalFireRate), cancellationToken: this.GetCancellationTokenOnDestroy());
             canShot = true;
         }
 
@@ -288,13 +312,13 @@ namespace jugyou.batoru.Player
                 if (target != null)
                 {
                     Debug.Log("teki");
-                    target.TekeDamage(WeaponData.AttackPower);
+                    target.TekeDamage(FinalAttackPower);
                 }
             }
         }
         private void Reload(InputAction.CallbackContext context)
         {
-            if (isReloding == false || CurrntAmmo != WeaponData.MaxAmmo) reload();
+            if (isReloding == false || CurrntAmmo != FInalMaxAmmo) reload();
         }
         private void reload()
         {
@@ -309,7 +333,9 @@ namespace jugyou.batoru.Player
             {
                 reloadCircleImage.fillAmount = 0;
             }
-            DOVirtual.Float(0f, 1f, WeaponData.ReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
+
+            float finalReloadTime = WeaponData != null ? WeaponData.ReloadTime * Mathf.Max(0.1f,1f - reloadSpeedBuf) : 0;
+            DOVirtual.Float(0f, 1f, finalReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
         }
         private void DrawLaserPointer()
         {
@@ -361,7 +387,7 @@ namespace jugyou.batoru.Player
         {
             if (ammoText != null)
             {
-                ammoText.SetText($"{CurrntAmmo}/{WeaponData.MaxAmmo}");
+                ammoText.SetText($"{CurrntAmmo}/{FInalMaxAmmo}");
             }
         }
         private void UpdateReloadUI(float value)
@@ -377,7 +403,7 @@ namespace jugyou.batoru.Player
             {
                 reloadUI.SetActive(false);
 
-                CurrntAmmo = WeaponData.MaxAmmo;
+                CurrntAmmo = FInalMaxAmmo;
                 UpdateCurrentAmooUI();
                 isReloding = false;
                 Debug.Log("crea");
@@ -389,7 +415,7 @@ namespace jugyou.batoru.Player
         {
             CurrntExp += exp;
 
-            if(CurrntExp >= RequiredExp)
+            if (CurrntExp >= RequiredExp)
             {
                 LevelUp();
             }
@@ -406,9 +432,9 @@ namespace jugyou.batoru.Player
 
         private void LevelUp()
         {
+            CurrntExp -= RequiredExp;
             CurrntLevel++;
 
-            CurrntExp -= RequiredExp;
 
             if (levelUpEffect != null)
             {
@@ -429,6 +455,30 @@ namespace jugyou.batoru.Player
             await UniTask.Delay(TimeSpan.FromSeconds(LevelUpEffectDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
 
             levelUpText.enabled = false;
+            LevelUpManager.Instance.OnLevelUp(inputActions, this);
+        }
+
+        public void ApplySkill(SkillDataRecord skill)
+        {
+            switch ((SkillType)skill.SkillType)
+            {
+                case SkillType.MoveSpeedUp:
+                    moveSpeedBuf += skill.Value;
+                    break;
+                case SkillType.AttackPowerUp:
+                    attackPowerBuf += skill.Value;
+                    break;
+                case SkillType.FireRateUp:
+                    fireRateBuf += skill.Value;
+                    break;
+                case SkillType.ReloadSpeedUp:
+                    reloadSpeedBuf += skill.Value;
+                    break;
+                case SkillType.MaxAmmoUp:
+                    UpdateCurrentAmooUI();
+                    maxAmmoBuf += (int)skill.Value;
+                    break;
+            }
         }
 
     }

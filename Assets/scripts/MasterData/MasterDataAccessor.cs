@@ -11,6 +11,7 @@ namespace MasterData
     {
         private const string ENEMY_LABLEL = "EnemyData";
         private const string WEAPON_LABLEL = "WeaponData";
+        private const string SKILL_LABLEL = "SkillData";
 
         /// <summary>
         /// 外部からアクセスするためのインスタンス
@@ -42,7 +43,7 @@ namespace MasterData
 
         public async UniTask InitializeAsync()
         {
-            await UniTask.WhenAll(LoadAsync<EnemyData, EnemyDataRecord>(ENEMY_LABLEL), LoadAsync<WeaponData, WeaponDataRecord>(WEAPON_LABLEL));
+            await UniTask.WhenAll(LoadAsync<EnemyData, EnemyDataRecord>(ENEMY_LABLEL), LoadAsync<WeaponData, WeaponDataRecord>(WEAPON_LABLEL),LoadAsync<SkillData,SkillDataRecord>(SKILL_LABLEL));
 
             Debug.Log("全てのマスターデータの読み込みが完了しました。");
         }

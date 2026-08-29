@@ -54,6 +54,8 @@ namespace jugyou.batoru.Camera
         }
         private void Update()
         {
+            if (Time.timeScale == 0f) return;
+
             lookInput = inputActions.Player.Look.ReadValue<Vector2>();
 
             currentYaw += lookInput.x * lookSensitivity;
