@@ -10,10 +10,11 @@ using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
 using jugyou.batoru.Manager;
+using Core.Manager;
 
 namespace jugyou.batoru.Player
 {
-    public class PlayerController : MonoBehaviour , IDamageable
+    public class PlayerController : MonoBehaviour, IDamageable
     {
         private const float moveSpeed = 5f; //変更不可のスピード
 
@@ -50,6 +51,10 @@ namespace jugyou.batoru.Player
         [SerializeField] ParticleSystem levelUpEffect;
 
         [SerializeField] Slider hpBar;
+
+        [SerializeField] AudioClip bgm;
+
+        [SerializeField] AudioClip se;
 
         private WeaponDataRecord WeaponData;
 
@@ -134,6 +139,8 @@ namespace jugyou.batoru.Player
                 reloadUI.SetActive(false);
             }
 
+            SoundManager.Instance.PlayBGM(bgm);
+
             CurrntExp = 0;
             CurrntLevel = 1;
 
@@ -215,6 +222,7 @@ namespace jugyou.batoru.Player
                 {
                     return;
                 }
+                SoundManager.Instance.PlaySE(se);
                 fireCT = new CancellationTokenSource();
                 var linkedCT = CancellationTokenSource.CreateLinkedTokenSource(fireCT.Token, this.GetCancellationTokenOnDestroy());
                 switch ((FireType)WeaponData.WeponType)
@@ -344,7 +352,7 @@ namespace jugyou.batoru.Player
                 reloadCircleImage.fillAmount = 0;
             }
 
-            float finalReloadTime = WeaponData != null ? WeaponData.ReloadTime * Mathf.Max(0.1f,1f - reloadSpeedBuf) : 0;
+            float finalReloadTime = WeaponData != null ? WeaponData.ReloadTime * Mathf.Max(0.1f, 1f - reloadSpeedBuf) : 0;
             DOVirtual.Float(0f, 1f, finalReloadTime, UpdateReloadUI).SetEase(Ease.Linear).OnComplete(FinishReload);
         }
         private void DrawLaserPointer()
@@ -488,12 +496,24 @@ namespace jugyou.batoru.Player
                     UpdateCurrentAmooUI();
                     maxAmmoBuf += (int)skill.Value;
                     break;
+                case SkillType.GunChenge:
+                    ulong Id = (ulong)skill.Value;
+                    if (weaponId == Id)
+                    {
+                        maxAmmoBuf += 10;
+                        return;
+                    }
+                    weaponId = Id;
+                    WeaponData = MasterDataAccessor.Instance.GetById<WeaponDataRecord>(weaponId);
+                    CurrntAmmo = WeaponData.MaxAmmo;
+                    UpdateWeaponUI();
+                    break;
             }
         }
 
         private void UpdateHpBar()
         {
-            if(hpBar != null)
+            if (hpBar != null)
             {
                 hpBar.value = (float)CurrntHP / MaxHP;
             }
@@ -503,7 +523,7 @@ namespace jugyou.batoru.Player
         {
             gameObject.SetActive(false);
 
-            if(GameManager.Instance != null)
+            if (GameManager.Instance != null)
             {
                 GameManager.Instance.GameOver();
             }
@@ -511,14 +531,14 @@ namespace jugyou.batoru.Player
 
         public void TakeDamage(int damage)
         {
-            if(damage <= 0 || CurrntHP <= 0)
+            if (damage <= 0 || CurrntHP <= 0)
             {
                 return;
             }
             CurrntHP -= damage;
             UpdateHpBar();
 
-            if(CurrntHP <= 0)
+            if (CurrntHP <= 0)
             {
                 Die();
             }

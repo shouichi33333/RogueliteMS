@@ -6,6 +6,7 @@ namespace jugyou.batoru.Enum
         AttackPowerUp,
         FireRateUp,
         ReloadSpeedUp,
-        MaxAmmoUp
+        MaxAmmoUp,
+        GunChenge
     }
 }

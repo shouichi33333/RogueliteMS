@@ -169,6 +169,9 @@ MonoBehaviour:
   expBar: {fileID: 0}
   levelUpText: {fileID: 0}
   levelUpEffect: {fileID: 6419593506106526418, guid: 942cdb3726ff63741a974c1107b742a9, type: 3}
+  hpBar: {fileID: 0}
+  bgm: {fileID: 8300000, guid: 0acc2d32c79fc104ea1a8bd1c10abf76, type: 3}
+  se: {fileID: 8300000, guid: 4452f789f602ed24c90d287f9e743aca, type: 3}
 --- !u!1 &7070734451058665481
 GameObject:
   m_ObjectHideFlags: 0

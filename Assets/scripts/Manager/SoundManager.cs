@@ -27,11 +27,20 @@ namespace Core.Manager
         }
         public void PlayBGM(AudioClip clip)
         {
-            if(clip != null)
+            if (clip != null)
             {
                 bgm.clip = clip;
                 bgm.volume = masterVolume * bgmVolume;
                 bgm.Play();
+            }
+        }
+        public void PlaySE(AudioClip clip)
+        {
+            if (clip != null)
+            {
+                se.clip = clip;
+                se.volume = masterVolume * seVolume;
+                se.PlayOneShot(se.clip);
             }
         }
         public void UpdateVolume()
