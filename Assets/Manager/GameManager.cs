@@ -95,7 +95,7 @@ namespace jugyou.batoru.Manager
         public void GameOver()
         {
             isGameActive = false;
-            IsGameClear = true;
+            IsGameClear = false;
             FinalLecel = player != null ? player.CurrntLevel : 0;
 
             Debug.Log("ƒQƒ€ƒIƒo");
